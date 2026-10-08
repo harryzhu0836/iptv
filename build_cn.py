@@ -3,23 +3,41 @@ import re
 import requests
 
 def parse_and_classify():
-    files = ["countries/cn.m3u", "countries/hk.m3u", "countries/tw.m3u"]
+    # iptv-org 最新结构的路径是在 streams/ 下
+    files = ["streams/cn.m3u", "streams/hk.m3u", "streams/tw.m3u"]
     raw_content = ""
     
-    # 优先读取本地文件，如果本地没有则自动在线下载兜底
+    # 1. 优先读取本地 Fork 仓库中的 streams/ 目录文件
     for filepath in files:
         if os.path.exists(filepath):
             with open(filepath, "r", encoding="utf-8") as f:
                 raw_content += f.read() + "\n"
         else:
-            url = f"https://raw.githubusercontent.com/iptv-org/iptv/master/{filepath}"
-            try:
-                res = requests.get(url, timeout=10)
-                if res.status_code == 200:
-                    raw_content += res.text + "\n"
-            except Exception as e:
-                print(f"下载失败: {url}, 错误: {e}")
+            # 2. 本地若没有则尝试去旧路径 countries/ 找
+            old_path = filepath.replace("streams/", "countries/")
+            if os.path.exists(old_path):
+                with open(old_path, "r", encoding="utf-8") as f:
+                    raw_content += f.read() + "\n"
+            else:
+                # 3. 在线兜底下载
+                urls = [
+                    f"https://raw.githubusercontent.com/iptv-org/iptv/master/{filepath}",
+                    f"https://iptv-org.github.io/iptv/{filepath}"
+                ]
+                for url in urls:
+                    try:
+                        res = requests.get(url, timeout=10)
+                        if res.status_code == 200 and len(res.text) > 100:
+                            raw_content += res.text + "\n"
+                            break
+                    except Exception as e:
+                        print(f"请求失败: {url}, 错误: {e}")
 
+    if not raw_content.strip():
+        print("未获取到有效的播放列表内容！")
+        return
+
+    # 解析所有的播放节点
     items = re.findall(r"(#EXTINF:[^\n]+\n[^\n]+)", raw_content)
     
     cctv_list = []       # 中央电视台
@@ -35,10 +53,13 @@ def parse_and_classify():
             continue
             
         info, stream_url = lines[0], lines[1].strip()
+        
+        # 简单去重
         if stream_url in seen_urls:
             continue
         seen_urls.add(stream_url)
         
+        # 匹配归类规则
         if any(keyword in info for keyword in ["CCTV", "CGTN"]):
             group = "中央电视台"
             cctv_list.append((info, stream_url, group))
@@ -69,6 +90,7 @@ def parse_and_classify():
             output_lines.append(info)
             output_lines.append(stream_url)
 
+    # 写入文件
     with open("cn_custom.m3u", "w", encoding="utf-8") as f:
         f.write("\n".join(output_lines) + "\n")
 
