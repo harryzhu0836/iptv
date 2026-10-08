@@ -1,12 +1,10 @@
 name: Generate Custom CN Playlist
 
 on:
-  # 监听 master 分支更新（无论手动推送还是上游同步，都会触发）
   push:
     branches:
       - master
   schedule:
-    # 每天 UTC 01:00（北京时间 9:00，在上游同步后）自动运行
     - cron: '0 1 * * *'
   workflow_dispatch:
 
@@ -14,11 +12,13 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write  # 显式声明代码写入权限
 
     steps:
       - name: 检出仓库代码
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 完整拉取 commit 历史，避免推送到裸仓库报错
 
       - name: 配置 Python 环境
         uses: actions/setup-python@v5
@@ -33,4 +33,11 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add cn_custom.m3u
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-generate classified cn_custom.m3u" && git push)
+          
+          # 检查是否有文件改动，有改动才提交，防止 128 报错
+          if ! git diff --staged --quiet; then
+            git commit -m "Auto-generate classified cn_custom.m3u"
+            git push origin master
+          else
+            echo "文件内容未发生改变，跳过提交。"
+          fi
