@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - main
   schedule:
     - cron: '0 1 * * *'
   workflow_dispatch:
@@ -12,13 +13,13 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # 显式声明代码写入权限
+      contents: write
 
     steps:
       - name: 检出仓库代码
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 完整拉取 commit 历史，避免推送到裸仓库报错
+          fetch-depth: 0
 
       - name: 配置 Python 环境
         uses: actions/setup-python@v5
@@ -34,10 +35,10 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add cn_custom.m3u
           
-          # 检查是否有文件改动，有改动才提交，防止 128 报错
+          # 判断是否有改动，有改动才提交，防止无改动提交触发 128 报错
           if ! git diff --staged --quiet; then
             git commit -m "Auto-generate classified cn_custom.m3u"
-            git push origin master
+            git push
           else
-            echo "文件内容未发生改变，跳过提交。"
+            echo "文件内容无变化，无需提交。"
           fi
