@@ -69,8 +69,6 @@ https://amg00405-rakutentv-cgtndocumentary-rakuten-0ql8j.amagi.tv/master.m3u8
 http://145.239.5.177/214/index.m3u8
 #EXTINF:-1 group-title="中央电视台" tvg-id="CGTNSpanish.cn@SD",CGTN Spanish (720p)
 http://45.165.82.19/test/index.m3u8
-#EXTINF:-1 group-title="中央电视台" tvg-id="CCTVWomensFashion.cn@SD",女性时尚 (576p)
-http://223.110.245.169/PLTV/4/224/3221227026/index.m3u8
 #EXTINF:-1 group-title="中央电视台" tvg-id="CGTNGlobalBiz.cn@SD",CGTN Global Biz (1080p)
 https://fastlive.cctvplus.com/out/v1/2b3d8a0c805d437f9dc85b764c2ac599/index.m3u8
 #EXTINF:-1 group-title="中央电视台" tvg-id="CGTN.cn@SD",CGTN (1080p)
@@ -589,6 +587,8 @@ http://dayeyun.live.tempsource.cjyun.org/videotmp/s10102-TC2T.m3u8
 http://yunshangdawu.live.tempsource.cjyun.org/videotmp/s10129-dwzhpd.m3u8
 #EXTINF:-1 group-title="地方电视台" tvg-id="",大爱海外 (720p)
 https://pulltv3.wanfudaluye.com/live/tv3.m3u8
+#EXTINF:-1 group-title="地方电视台" tvg-id="CCTVWomensFashion.cn@SD",女性时尚 (576p)
+http://223.110.245.169/PLTV/4/224/3221227026/index.m3u8
 #EXTINF:-1 group-title="地方电视台" tvg-id="",孟州电视台 (1080p) [Not 24/7]
 http://live.dxhmt.cn:9081/tv/10883-1.m3u8
 #EXTINF:-1 group-title="地方电视台" tvg-id="",安徽 Ⅰ 郎溪综合台 (1080p)
